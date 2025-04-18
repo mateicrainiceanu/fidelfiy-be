@@ -1,3 +1,4 @@
+import logger from "../config/logger";
 import UserService from "../services/UserServices";
 import { matchesHash } from "../utils/hash";
 
@@ -6,6 +7,8 @@ class UserController {
         const user = await UserService.createUser(email, password);
 
         const token = await UserService.tokenize(user);
+
+        logger.info(`User created [${user.id}]`);
 
         return { user, token }
     }

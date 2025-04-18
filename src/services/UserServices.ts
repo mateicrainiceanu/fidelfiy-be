@@ -1,7 +1,7 @@
 import { hashPassword } from "../utils/hash";
 import User from "../models/User";
 import jwt from "jsonwebtoken";
-import { jwtsecret } from "../utils/global";
+import { jwtsecret } from "../config/global";
 
 export default class UserService {
 
