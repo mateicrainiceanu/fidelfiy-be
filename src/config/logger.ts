@@ -1,5 +1,5 @@
-import pino, { multistream } from 'pino';
-import { fileLogLever, logLevel } from './global';
+import pino from 'pino';
+import {enableFileLogging, fileLogLevel, logLevel} from './global';
 import { destinationLogFile } from './global';
 import fs from 'fs';
 import path from 'path';
@@ -12,24 +12,30 @@ if (!fs.existsSync(logDirectory)) {
 if (!fs.existsSync(destinationLogFile)) {
     fs.writeFileSync(destinationLogFile, '', { flag: 'w' });
 }
-const stream = fs.createWriteStream(destinationLogFile, { flags: 'a' });
 
-const streams = [
-    { stream: stream, level: fileLogLever, ignore: 'pid,hostname' },
-    {stream: pino.transport({
-        level: logLevel, 
-        target: 'pino-pretty',
-        options: {
-            colorize: true,
-            translateTime: 'SYS:standard',
-            ignore: 'pid,hostname',
-        },
-    })},
-]
+const targets: any[] = [ {
+    level: logLevel,
+    target: 'pino-pretty',
+    options: {
+        colorize: true,
+        translateTime: 'SYS:standard',
+        ignore: 'pid,hostname',
+    },
+}];
+
+if (enableFileLogging) {
+    targets.push({
+        level: fileLogLevel,
+        target: 'pino/file',
+        options: { destination: destinationLogFile }
+    });
+}
 
 const logger = pino({
     level: logLevel,
-
-}, multistream(streams));
+    transport: {
+        targets: targets
+    }
+});
 
 export default logger;

@@ -1,5 +1,4 @@
 import { Request } from 'express';
-import { decode } from 'jsonwebtoken';
 import { AuthUser, decodeToken } from '../decodeToken';
 import logger from '../../config/logger';
 
@@ -17,7 +16,7 @@ export default async function auth(req: AuthenticatedRequest, res, next) {
     if (!token) {
         res.status(401).send('User not authenticated');
         return;
-    };
+    }
 
     const bearerToken = token.split('Bearer ')[1];
     if (!bearerToken) {

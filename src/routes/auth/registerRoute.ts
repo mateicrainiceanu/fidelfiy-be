@@ -1,13 +1,20 @@
 import express from "express";
 import UserController from "../../controllers/UserController";
+import validate from "../../utils/middleware/validate";
+import {body} from "express-validator";
 
 const router = express.Router()
 
-router.post("/register", async (req, res) => {
+router.post("/register",
+    validate([
+        body('email').isEmail(),
+        body('password').isString().isLength({min: 8})
+    ]),
+    async (req, res) => {
     const { email, password }: { email?: string, password?: string } = req.body || {};
 
     if (!email || !password) {
-        res.status(400).send("A username or password must be provided");
+        res.status(400).send("An email or password must be provided");
         return;
     }
 
