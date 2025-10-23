@@ -11,7 +11,7 @@ export default function validate(validations: ContextRunner[]) {
                 const text = result.array()[0].msg
                 logger.error(`[Validation Error] ${JSON.stringify(result.array())}`);
 
-                res.status(400).send(text);
+                res.status(400).json({error: text});
                 return;
             }
         }

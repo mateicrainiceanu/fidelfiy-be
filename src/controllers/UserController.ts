@@ -22,6 +22,8 @@ class UserController {
 
         logger.debug(`[UserController.registerUser] User created [${user.id}]`);
 
+        delete user.hash;
+
         return { user, token }
     }
 
