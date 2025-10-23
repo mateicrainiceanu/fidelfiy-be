@@ -12,6 +12,10 @@ class UserController {
             throw new CustomError(400, "An user with this email already exists!");
         }
 
+        if (!email || !password) {
+            throw new CustomError(400, "An email or password must be provided!");
+        }
+
         const user = await UserService.createUser(email, password);
 
         const token = await UserService.tokenize(user);

@@ -1,6 +1,6 @@
 require("dotenv").config();
 
-export const connectionString = process.env.POSTGRES_DB;
+export const connectionString = process.env.DATABASE_URL;
 export const jwtsecret = process.env.JWT_SECRET;
 export const logLevel = process.env.LOG_LEVEL || "info";
 export const destinationLogFile = "./logs/" + (process.env.DESTINATION_LOG_FILE || "app") + `-${new Date(Date.now()).toISOString()}` + ".log";

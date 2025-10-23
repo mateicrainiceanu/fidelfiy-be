@@ -11,12 +11,7 @@ router.post("/register",
         body('password').isString().isLength({min: 8})
     ]),
     async (req, res) => {
-    const { email, password }: { email?: string, password?: string } = req.body || {};
-
-    if (!email || !password) {
-        res.status(400).send("An email or password must be provided");
-        return;
-    }
+    const { email, password }: { email?: string, password?: string} = req.body || {};
 
     const {user, token} = await UserController.registerUser(email, password);
 

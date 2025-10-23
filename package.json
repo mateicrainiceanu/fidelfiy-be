@@ -6,7 +6,11 @@
   "scripts": {
     "start": "tsc && node dist/app.js",
     "dev": "tsc -w & nodemon dist/app.js | npx pino-pretty",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prisma:generate": "npx prisma generate",
+    "migration:create": "npx prisma migrate dev --create-only",
+    "migrate": "npx prisma migrate deploy",
+    "prisma-regen": "rm -rf node_modules/.prisma && rm -rf src/generated/prisma && npm install && npx prisma generate"
   },
   "keywords": [],
   "author": "",
@@ -21,6 +25,7 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "@prisma/client": "^6.17.1",
     "bcrypt": "^5.1.1",
     "body-parser": "^2.2.0",
     "cors": "^2.8.5",
