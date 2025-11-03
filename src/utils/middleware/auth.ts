@@ -1,6 +1,7 @@
 import { Request } from 'express';
 import { AuthUser, decodeToken } from '../decodeToken';
 import logger from '../../config/logger';
+import CustomError from "../CustomError";
 
 interface AuthenticatedRequest extends Request {
     headers: {
@@ -14,14 +15,12 @@ interface AuthenticatedRequest extends Request {
 export default async function auth(req: AuthenticatedRequest, res, next) {
     const token = req.get('authorization');
     if (!token) {
-        res.status(401).send('User not authenticated');
-        return;
+        throw new CustomError(403, 'User not authenticated');
     }
 
     const bearerToken = token.split('Bearer ')[1];
     if (!bearerToken) {
-        res.status(401).send('User not authenticated');
-        return;
+        throw new CustomError(403, 'User not authenticated: Token is not in correct format');
     }
 
     try {
@@ -29,8 +28,7 @@ export default async function auth(req: AuthenticatedRequest, res, next) {
         logger.info(`User [${req.user.id}] verified`);
         next();
     } catch (error) {
-        res.status(401).send(error.message);
         logger.error(`Error decoding token: ${error.message}`);
-        return;
+        throw new CustomError(403, 'User not authenticated: Invalid token');
     }
 }

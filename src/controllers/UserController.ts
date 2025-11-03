@@ -18,11 +18,11 @@ class UserController {
 
         const user = await UserService.createUser(email, password);
 
-        const token = await UserService.tokenize(user);
+        const token = UserService.tokenize(user);
 
         logger.debug(`[UserController.registerUser] User created [${user.id}]`);
 
-        delete user.hash;
+        UserService.sanitize(user);
 
         return { user, token }
     }
@@ -38,7 +38,7 @@ class UserController {
             throw Error("Passwords do not match!");
         }
 
-        delete user.hash;
+        UserService.sanitize(user);
 
         const token = UserService.tokenize(user);
 
@@ -46,7 +46,30 @@ class UserController {
 
         return { user, token }
     }
+    
+    static async getUser(id: string) {
+        const user = await UserService.getById(id);
+        if (user === null) {
+            throw new CustomError(404, "No user with this id was found!");
+        }
+        UserService.sanitize(user);
+        return user;
+    }
 
+    static async updateUser(id: string, data: object) {
+        logger.debug(`UserController.updateUser => ${id}`);
+        const user = await UserService.getById(id);
+
+        if (!user) {
+            throw new CustomError(404, "No user with this id was found!");
+        }
+
+        const updatedUser = await UserService.updateUser(id, data);
+
+        const token = UserService.tokenize(updatedUser);
+
+        return {token, user: updatedUser};
+    }
 }
 
 export default UserController;
