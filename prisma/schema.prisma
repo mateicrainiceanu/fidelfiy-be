@@ -23,18 +23,17 @@ model User {
   hash    String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  businesses  Business[]
-  UserBusiness UserBusiness[]
+  userBusinesses UserBusiness[]
 }
 
 model Business {
-  id          String @id @default(uuid())
-  identifier  String @unique
-  name        String @unique
-  pictureUrl  String?
-  website     String?
-  admins      User[]
-  UserBusiness UserBusiness[]
+  id              String @id @default(uuid())
+  identifier      String @unique
+  name            String @unique
+  pictureUrl      String?
+  website         String?
+  onlineStatus    BusinessOnlineStatus @default(PENDING_VALIDATION)
+  usersBusiness   UserBusiness[]
 }
 
 model UserBusiness {
@@ -43,8 +42,16 @@ model UserBusiness {
   businessId        String
   user              User        @relation(fields: [userId], references: [id])
   business          Business    @relation(fields: [businessId], references: [id])
+  isCreator         Boolean     @default(false)
   canCreate         Boolean     @default(false)
   canEditOffer      Boolean     @default(false)
   canSeeOffer       Boolean     @default(false)
   canValidateOffer  Boolean     @default(true)
+}
+
+enum BusinessOnlineStatus {
+  ONLINE
+  PENDING_VALIDATION
+  PENDING_PAYMENT
+  HIDDEN
 }

@@ -38,6 +38,7 @@
     "pg-hstore": "^2.3.4",
     "pino": "^9.6.0",
     "pino-multi-stream": "^3.1.2",
-    "sequelize": "^6.37.7"
+    "sequelize": "^6.37.7",
+    "uuid": "^13.0.0"
   }
 }
