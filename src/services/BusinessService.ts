@@ -15,6 +15,8 @@ export type BusinessSanitized = Omit<BusinessWithUsers, "usersBusiness">;
 export default class BusinessService {
     static async createBusiness(creatorId: string, data: any) {
 
+        delete data.id;
+
         if (!data.pictureUrl) data.pictureUrl = null;
         if (!data.website) data.website = null;
 
@@ -42,6 +44,24 @@ export default class BusinessService {
         });
 
         return this.sanitize(business, creatorId);
+    }
+
+    static async getBusinessesForAdmin(authUserId: string) {
+        logger.trace(`[BusinessService.getBusinessesForAdmin] Getting businesses for admin [${authUserId}]`);
+        const result = await prisma.business.findMany({
+            where: {
+                usersBusiness: {
+                    some: {
+                        userId: authUserId,
+                    }
+                }
+            },
+            include: {
+                usersBusiness: true,
+            }
+        });
+
+        return result.map(b => this.sanitize(b, authUserId));
     }
 
     static async isIdentifierValid(identifier: string) {

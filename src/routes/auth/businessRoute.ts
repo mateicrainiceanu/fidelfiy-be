@@ -1,14 +1,20 @@
 import express from "express";
 import auth from "../../utils/middleware/auth";
 import validate from "../../utils/middleware/validate";
-import {body, param} from "express-validator";
+import {body, param, query} from "express-validator";
 import BusinessController from "../../controllers/BusinessController";
 
 const router = express.Router();
 
 router.get("/businesses",
+    auth,
+    validate([
+        query('for').isString().isIn(['admin', 'user'])
+    ]),
     async (req, res) => {
-        res.status(200).send([]);
+
+        const businesses = await BusinessController.getBusinessFor(req.user.id, req.query.for);
+        res.status(200).send({businesses});
     });
 
 router.get("/business/:identifier",
