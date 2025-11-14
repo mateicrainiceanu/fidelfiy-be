@@ -4,6 +4,7 @@ import {Prisma} from "@prisma/client";
 import CustomError from "../utils/CustomError";
 
 import {validate as isUUID} from "uuid";
+import BusinessData from "../models/BusinessData";
 
 // Type for Business that includes usersBusiness relation
 export type BusinessWithUsers = Prisma.BusinessGetPayload<{ include: { usersBusiness: true } }>;
@@ -11,16 +12,8 @@ export type BusinessWithUsers = Prisma.BusinessGetPayload<{ include: { usersBusi
 // Type after sanitization (without the relation)
 export type BusinessSanitized = Omit<BusinessWithUsers, "usersBusiness">;
 
-
 export default class BusinessService {
     static async createBusiness(creatorId: string, data: any) {
-
-        delete data.id;
-
-        if (!data.pictureUrl) data.pictureUrl = null;
-        if (!data.website) data.website = null;
-
-        data.identifier = data.identifier.toLowerCase();
 
         logger.trace(`[BusinessService.createBusiness] Creating business [${creatorId}] [${data}]`);
 
@@ -88,6 +81,22 @@ export default class BusinessService {
         return this.sanitize(found, authUserId);
     }
 
+    static async updateBusiness(id: string, data: any, authUserId: string) {
+        const cleanData = this.sanitizeInputData(data);
+
+        logger.trace(`[BusinessService.updateBusiness] Updating business [${id}] [${JSON.stringify(cleanData)}]}]`);
+
+        const updatedBusiness = await prisma.business.update({
+            where: {id},
+            data: cleanData,
+            include: {
+                usersBusiness: true,
+            }
+        });
+
+        return this.sanitize(updatedBusiness, authUserId);
+    }
+
     private static sanitize(business: BusinessWithUsers, authUserId: string = null) {
         logger.trace(`[BusinessService.sanitize] Sanitizing business [${business.id}]`);
 
@@ -102,10 +111,11 @@ export default class BusinessService {
 
         logger.trace(`[BusinessService.getPermissions] Getting permissions for business [${b.id}]`);
 
-        const userPermissions= b.usersBusiness.find(u => u.userId === authUserId);
+        const userPermissions = b.usersBusiness.find(u => u.userId === authUserId);
 
         if (userPermissions == null) {
             return {
+                id: "0",
                 isCreator: false,
                 canCreate: false,
                 canEditOffer: false,
@@ -118,5 +128,10 @@ export default class BusinessService {
         delete userPermissions.businessId;
 
         return userPermissions;
+    }
+
+    private static sanitizeInputData(data: any) {
+        logger.trace(`[BusinessService.sanitizeInputData] Sanitizing input data [${data}]`);
+        return BusinessData.fromData(data);
     }
 }

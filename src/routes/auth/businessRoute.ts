@@ -43,9 +43,17 @@ router.post("/business", auth,
         res.status(200).send(business);
     });
 
-router.put("/business/:identifier", auth,
+router.put("/business/:identifier",
+    validate([
+        param('identifier').isString().isLength({min: 3}),
+        body('name').isString().isLength({min: 3}),
+        body('identifier').isString().isLength({min: 3})
+    ]),
+    auth,
     async (req, res) => {
-        throw new Error("Not implemented");
+        const updatedBusiness = await BusinessController.updateBusinessData(req.params.identifier, req.body, req.user.id);
+
+        res.status(200).send(updatedBusiness);
     }
 );
 

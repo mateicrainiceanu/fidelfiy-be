@@ -29,6 +29,19 @@ export default class BusinessController {
         }
     }
 
+    static async updateBusinessData(identifier: string, data: any, authUserId: string) {
+        const business = await BusinessService.getBusiness(identifier, authUserId);
+        if (business === null) {
+            throw new CustomError(404, "No business with this id was found!");
+        }
+
+        if (!business.permissions.isCreator) {
+            throw new CustomError(403, "You are not authorized to update this business!");
+        }
+
+        return BusinessService.updateBusiness(identifier, data, authUserId);
+    }
+
     private static getBusinessesForAdmin(authUserId: string) {
         logger.debug(`[BusinessController.getBusinessesForAdmin] Getting businesses for admin [${authUserId}]`);
         return BusinessService.getBusinessesForAdmin(authUserId);
