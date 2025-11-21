@@ -34,19 +34,38 @@ model Business {
   website         String?
   onlineStatus    BusinessOnlineStatus @default(PENDING_VALIDATION)
   usersBusiness   UserBusiness[]
+  offers          Offer[]
 }
 
 model UserBusiness {
   id                String      @id @default(uuid())
   userId            String
   businessId        String
-  user              User        @relation(fields: [userId], references: [id])
-  business          Business    @relation(fields: [businessId], references: [id])
+  user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  business          Business    @relation(fields: [businessId], references: [id], onDelete: Cascade)
   isCreator         Boolean     @default(false)
   canCreate         Boolean     @default(false)
   canEditOffer      Boolean     @default(false)
   canSeeOffer       Boolean     @default(false)
   canValidateOffer  Boolean     @default(true)
+}
+
+model Offer {
+  id                  String                @id @default(uuid())
+  businessId          String
+  business            Business              @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  activeStatus        OfferActiveStatus
+  title               String
+  terms               String
+  activeDateStart     DateTime?             @default(now())
+  activeDateEnd       DateTime?
+  procentualDiscount  Float
+}
+
+enum OfferActiveStatus {
+  PUBLIC
+  IN_STORE_ACTIVATED
+  HIDDEN
 }
 
 enum BusinessOnlineStatus {

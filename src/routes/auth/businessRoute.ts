@@ -3,6 +3,7 @@ import auth from "../../utils/middleware/auth";
 import validate from "../../utils/middleware/validate";
 import {body, param, query} from "express-validator";
 import BusinessController from "../../controllers/BusinessController";
+import UserController from "../../controllers/UserController";
 
 const router = express.Router();
 
@@ -57,10 +58,15 @@ router.put("/business/:identifier",
     }
 );
 
-router.delete("/business/:identifier", auth,
+router.delete("/business/:identifier",
+    validate([
+        param('identifier').isString().isLength({min: 3})
+    ]),
+    auth,
     async (req, res) => {
+        const response = await BusinessController.deleteBusiness(req.params.identifier, req.user.id);
 
-        throw new Error("Not implemented");
+        res.status(204).send(response);
     }
 );
 

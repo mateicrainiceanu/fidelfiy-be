@@ -17,9 +17,11 @@ export default class BusinessService {
 
         logger.trace(`[BusinessService.createBusiness] Creating business [${creatorId}] [${data}]`);
 
+        const cleanData = this.sanitizeInputData(data);
+
         const business: BusinessWithUsers = await prisma.business.create({
             data: {
-                ...data,
+                ...cleanData,
                 usersBusiness: {
                     create: {
                         userId: creatorId,
@@ -95,6 +97,11 @@ export default class BusinessService {
         });
 
         return this.sanitize(updatedBusiness, authUserId);
+    }
+
+    static async deleteBusiness(id: string) {
+        logger.trace(`[BusinessService.deleteBusiness] Deleting business [${id}]`);
+        return prisma.business.delete({where: {id}});
     }
 
     private static sanitize(business: BusinessWithUsers, authUserId: string = null) {
